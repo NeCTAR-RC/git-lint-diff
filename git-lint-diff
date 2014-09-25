@@ -39,6 +39,11 @@ line_matchers = {
     'puppet-lint': re.compile(r'^([^\s]+) - .* ([\d]+)$'),
 }
 
+executables = {
+    'flake8': 'flake8',
+    'puppet-lint': 'puppet-lint',
+}
+
 
 def which(name, flags=os.X_OK):
     """taken from twisted/python/procutils.py"""
@@ -192,10 +197,10 @@ if __name__ == '__main__':
         help='Check the entire repository, not just changed files.')
     parser.add_argument(
         '--linter', choices=line_matchers.keys(),
-        default='puppet-lint')
+        required=True)
     parser.add_argument(
         'executable',
-        metavar='ARG', nargs='+',
+        metavar='ARG', nargs='*',
         help='The executable to run, and any desired arguments.')
     parser.add_argument(
         '-g', '--git-executable', action='store', default=GIT,
@@ -221,7 +226,10 @@ if __name__ == '__main__':
         changed_lines = git_diff_linenumbers
 
     if not args.executable:
-        parser.error("No executable specified.")
+        args.executable = [executables[args.linter]]
+
+    if not which(args.executable[0]):
+        parser.error("Can't find executable at %s." % args.executable[0])
 
     if not os.path.exists(which(args.executable[0])[0]):
         parser.error("Can't find executable at %s." % args.executable[0])
