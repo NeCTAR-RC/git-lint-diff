@@ -6,4 +6,4 @@ setup(name='flake8-diff',
       author='Russell Sim',
       author_email='russell.sim@gmail.com',
       install_requires=['flake8'],
-      scripts=['flake8-diff.py'])
+      scripts=['git-lint-diff'])
