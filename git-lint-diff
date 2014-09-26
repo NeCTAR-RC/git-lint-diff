@@ -232,12 +232,14 @@ if __name__ == '__main__':
 
     if not args.executable:
         args.executable = [executables[args.linter]]
-
-    if not which(args.executable[0]):
+    if args.executable[0][0] in ('/', '.'):
+        if not os.path.exists(os.path.abspath(args.executable[0])):
+            parser.error("Can't find executable at %s." % args.executable[0])
+    elif not which(args.executable[0]):
         parser.error("Can't find executable at %s." % args.executable[0])
-
-    if not os.path.exists(which(args.executable[0])[0]):
-        parser.error("Can't find executable at %s." % args.executable[0])
+    else:
+        if not os.path.exists(which(args.executable[0])[0]):
+            parser.error("Can't find executable at %s." % args.executable[0])
 
     GIT = args.git_executable
     if not os.path.exists(GIT):
