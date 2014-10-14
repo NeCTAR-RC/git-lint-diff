@@ -31,6 +31,7 @@ import re
 import sys
 import subprocess
 import logging
+from functools import wraps
 
 log = logging.getLogger(__file__)
 
@@ -70,6 +71,19 @@ except:
     GIT = ""
 
 
+def simple_cache(f):
+    cache = {}
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        key = (args, tuple(kwargs.items()))
+        if key not in cache:
+            cache[key] = f(*args, **kwargs)
+        return cache[key]
+    return wrapper
+
+
+@simple_cache
 def git_diff_linenumbers(filename, revision=None):
     """Return a list of lines that have been added/changed in a file."""
     diff_command = ' '.join(['diff',
